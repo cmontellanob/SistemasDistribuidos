@@ -1,0 +1,7 @@
+module pkgcorba
+{
+  interface Hello
+  {
+    string foo( in long input );
+  };
+};

@@ -13,7 +13,7 @@ public class server {
             BufferedReader fromClient;  // buffer de lectura
             PrintStream toClient;       // stream para escritura
             while(true){   // ciclo al infinito para elfuncionamiento del server
-                client = server.accept(); // aceptala conexion
+                client = server.accept(); // el servidorse queda esperando establecer conexion 
                 fromClient = new BufferedReader(new InputStreamReader(client.getInputStream())); // el lector
                 String cadena;
                 cadena = fromClient.readLine(); //cadena obtenida desde el lector

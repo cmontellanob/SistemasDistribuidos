@@ -21,3 +21,13 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+/Mayor3Contiuo/nbproject/private/
+/Mayor3Contiuo/build/
+/Greek/nbproject/private/
+/Greek/build/
+/Echo/build/
+/SocketUDP/nbproject/private/
+/SocketUDP/build/
+/RMIFactorial/build/
+/RMIFactorial/nbproject/private/
+/RMIFactorial/dist/
