@@ -35,7 +35,7 @@ public class ServidorCessa
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-        public String Pagar(Factura[] facturas) throws RemoteException {
+        public String pagar(Factura[] facturas) throws RemoteException {
             return "SI";
     }    
     

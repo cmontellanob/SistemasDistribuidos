@@ -12,7 +12,7 @@ import java.rmi.server.UnicastRemoteObject;
 
 public class ServidorBanco 
     extends UnicastRemoteObject
-    implements OperacionesEmpresa
+    implements IOperacionesEmpresa
 	 
 {
     ServidorBanco() throws java.rmi.RemoteException{
@@ -45,7 +45,7 @@ public class ServidorBanco
 	return null;
         }
     }    
-    public String Pagar(Factura[] facturas) throws RemoteException {
+    public String pagar(Factura[] facturas) throws RemoteException {
           ICessa cessa;
         try 
         {
@@ -79,7 +79,7 @@ public class ServidorBanco
                 iCessa++;
             }
         }
-        return cessa.Pagar(FacturasCessa)+llamarElapas("pag-"+facturasElapas);
+        return cessa.pagar(FacturasCessa)+llamarElapas("pag-"+facturasElapas);
         }
         catch (Exception e){
 	    e.printStackTrace();

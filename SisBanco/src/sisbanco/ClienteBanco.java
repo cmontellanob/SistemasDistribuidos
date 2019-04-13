@@ -7,11 +7,11 @@ import java.util.Scanner;
 
 public class ClienteBanco{
     public static void main(String args[]){
-	OperacionesEmpresa operaciones;
+	IOperacionesEmpresa operaciones;
       int idcliente;
       String pago="";
 	try {
-	    operaciones=(OperacionesEmpresa)Naming.lookup("rmi://localhost/Operaciones");
+	    operaciones=(IOperacionesEmpresa)Naming.lookup("rmi://localhost/Operaciones");
             System.out.println("Introduzca IdCliente");
             Scanner entradaEscaner = new Scanner (System.in); //Creación de un objeto Scanner
             idcliente = entradaEscaner.nextInt(); //Invocamos un método sobre un objeto Scanner
@@ -25,7 +25,7 @@ public class ClienteBanco{
             
             if (pendientes.length!=0)
             {
-                pago=operaciones.Pagar(pendientes);
+                pago=operaciones.pagar(pendientes);
                 System.out.println("Se llamo a pagar con exito "+pago);
             }
                 System.out.println();
