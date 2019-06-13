@@ -1,0 +1,29 @@
+*******servidor*********
+
+1) Ejecutar el modo consola y entrar en el directorio donde se quiere ejecutar el idl con el sgte comando:
+idlj -fall suma.idl
+
+2) Compilar nuestras clases para ello usaremos la siguiente línea estando dentro de la carpeta donde esta nuestra aplicación: 
+javac *.java sumaApp/*.java 
+
+3) Estando en la misma carpeta de ejecucion escribir la linea de comando para que escuche el puerto del servidor....
+orbd -ORBInitialPort 10800 
+
+* ordb.exe viene en la carpeta bin del sdk de java 
+
+Si todo salió bien el servicio orbd se iniciara escuchando en el puerto 10800 (ustedes pueden elegir que puerto usar de los 65000 disponibles) 
+
+4) Ahora tenemos que iniciar nuestro servidor de sumas dentro del servicio orbd, la línea es la siguiente:
+java SumaServer -ORBInitialPort 6000 -ORBInitialHost localhost
+
+Si les sale el mensaje: “servidor de suma listo y en espera” todo va muy bien.
+
+
+*****cliente*****
+
+5) Como paso final: Ejecutar el cliente para verificar que todo funcione, la línea es como sigue: 
+java SumaClient -ORBInitialPort 6000 -ORBInitialHost localhost 
+
+*******
+si desea ejecutarlo en dos maquinas distintas en ves de poner localhost se coloca la IP del servidor....
+y en la ejecucion del cliente se pone la IP del servidor............

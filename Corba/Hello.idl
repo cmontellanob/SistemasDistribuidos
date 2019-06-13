@@ -1,7 +1,8 @@
-module pkgcorba
+module HelloApp
 {
   interface Hello
   {
-    string foo( in long input );
+  string sayHello();
+  oneway void shutdown();
   };
 };
