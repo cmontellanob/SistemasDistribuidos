@@ -15,7 +15,7 @@ public class ServidorElapas {
         try 
         {
             ServerSocket server = new ServerSocket(port); //instanciamos un servidor socket
-            System.out.println("El servidor esta listo\n");
+            System.out.println("El servidor Elapas esta listo\n");
             Socket client;
             BufferedReader fromClient;  // buffer de lectura
             PrintStream toClient;       // stream para escritura
@@ -24,13 +24,16 @@ public class ServidorElapas {
                 fromClient = new BufferedReader(new InputStreamReader(client.getInputStream())); // el lector
                 String cadena;
                 cadena = fromClient.readLine(); //cadena obtenida desde el lector
+                String[] separado=cadena.split("-");
                 toClient = new PrintStream(client.getOutputStream()); //prepara el objetopara devolver
                 System.out.println("Comando Recibido"+cadena);
-                if (cadena.substring(3, 4).equals("-")) {
-                    String  comando = cadena.substring(0, 3);
+                if (separado.length==3) {
+                    String llave=separado[2];
+                    System.out.print(llave);
+                    String  comando = separado[0];
                     
                     if (comando.equals("fac")) {
-                        Integer idcliente  = Integer.parseInt(cadena.substring(4));
+                        Integer idcliente  = Integer.parseInt(separado[1]);
                         if (idcliente==1)
                         {
                             Respuesta="2256-36,3216-26,4547-44";

@@ -1,0 +1,4 @@
+interface servicioscotes{
+        string facturaspendientes(in long numero,in string llave);
+        string pagar(in long idfactura,in string llave);
+};

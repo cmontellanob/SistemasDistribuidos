@@ -7,6 +7,7 @@ package sisbancocompleto;
 
 import java.rmi.Naming;
 import java.util.Scanner;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 /**
  *
@@ -17,9 +18,22 @@ public class ClienteBanco extends javax.swing.JFrame {
     /**
      * Creates new form ClienteBanco
      */
+    Factura [] pendientes;
+    IOperacionesEmpresa operaciones;
+    private String llave="sin llave";
+    public void setLlave(String Llave)
+        {
+      this.llave=Llave;
+    }
     public ClienteBanco() {
         initComponents();
         this.setTitle("Cliente Banco");  
+        try {
+	    operaciones=(IOperacionesEmpresa)Naming.lookup("rmi://localhost/Operaciones");
+        }
+        catch (Exception e){
+	    e.printStackTrace();
+	}
 
         
     }
@@ -39,6 +53,11 @@ public class ClienteBanco extends javax.swing.JFrame {
         btnObtener = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
+        btnPagar = new javax.swing.JButton();
+        btnCalcular = new javax.swing.JButton();
+        lblTotal = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        lbldolares = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -88,6 +107,26 @@ public class ClienteBanco extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(jTable1);
 
+        btnPagar.setText("Pagar");
+        btnPagar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPagarActionPerformed(evt);
+            }
+        });
+
+        btnCalcular.setText("Calcular");
+        btnCalcular.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCalcularActionPerformed(evt);
+            }
+        });
+
+        lblTotal.setText("0");
+
+        jLabel2.setText("Equivalente a $us:");
+
+        lbldolares.setText("0");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -95,7 +134,18 @@ public class ClienteBanco extends javax.swing.JFrame {
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnCalcular)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel2)
+                        .addGap(32, 32, 32)
+                        .addComponent(lbldolares, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnPagar)))
                 .addContainerGap(48, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -104,7 +154,24 @@ public class ClienteBanco extends javax.swing.JFrame {
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 117, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(btnPagar)
+                                    .addComponent(btnCalcular)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(lblTotal)
+                                    .addComponent(jLabel2))))
+                        .addGap(0, 76, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lbldolares)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
 
         pack();
@@ -112,40 +179,91 @@ public class ClienteBanco extends javax.swing.JFrame {
 
     private void btnObtenerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnObtenerActionPerformed
         // TODO add your handling code here:
-        IOperacionesEmpresa operaciones;
+        
         int idcliente=Integer.parseInt(txtId.getText());   
         DefaultTableModel TableModel = new DefaultTableModel();
         
         try {
 	    operaciones=(IOperacionesEmpresa)Naming.lookup("rmi://localhost/Operaciones");
-            Factura [] pendientes=operaciones.calcular(idcliente);
+            pendientes=operaciones.calcular(idcliente,this.llave);
+            Object[][] datos= new Object[pendientes.length][4];
+           
+            int i=0;
             for(Factura f:pendientes)
-            { System.out.print(f.getEmpresa()+"   ");
-            System.out.print(f.getIdFactura()+"   ");
-            System.out.println(f.getMonto());
+            { datos[i][0]=false;
+              datos[i][1]=f.getEmpresa();
+              datos[i][2]=f.getIdFactura();
+              datos[i][3]=f.getMonto();
+              i++;
             }
+            TableModel.setDataVector(datos, new Object[] {
+            "Pagar", "Empresa", "Nro Factura", "Monto" });
+            jTable1.setModel(TableModel);
+        //Se crea el JCheckBox en la columna indicada en getColumn, en este caso, la primera columna
+            jTable1.getColumnModel().getColumn( 0 ).setCellEditor( new Celda_CheckBox() );
+        //para pintar la columna con el CheckBox en la tabla, en este caso, la primera columna
+            jTable1.getColumnModel().getColumn( 0 ).setCellRenderer(new Render_CheckBox());      
+
         }        
         
 	catch (Exception e){
 	    e.printStackTrace();
 	}
-        TableModel.setDataVector(new Object[][] {
-        { false, "Juan Perez", "12", "Hombre" },
-        { false, "Homero J. Simpsons", "40", "Hombre" },
-        { false, "Ned Flanders", "35", "Hombre" },
-        { false, "Asuka Langley", "15", "Si gracias" },
-        { false, "Rei Ayanami", "16", "Mujer" },
-        { false, "shinji ikari", "15", "No se sabe" } }, new Object[] {
-        "Pagar", "Empresa", "Nro Factura", "Monto" });
-        jTable1.setModel(TableModel);
         
-        //Se crea el JCheckBox en la columna indicada en getColumn, en este caso, la primera columna
-        jTable1.getColumnModel().getColumn( 0 ).setCellEditor( new Celda_CheckBox() );
-        //para pintar la columna con el CheckBox en la tabla, en este caso, la primera columna
-        jTable1.getColumnModel().getColumn( 0 ).setCellRenderer(new Render_CheckBox());      
-
+        
+       
+            
+            
+  
     }//GEN-LAST:event_btnObtenerActionPerformed
 
+    private void btnPagarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPagarActionPerformed
+        // TODO add your handling code here:
+        int nroseleccionado=0;
+        for (int i = 0; i < jTable1.getRowCount(); i++) {
+            if ((Boolean)jTable1.getValueAt(i, 0))
+            {
+                nroseleccionado++;
+            }
+        }
+        Factura [] cancelar=new Factura[nroseleccionado];
+        int j=0;
+        
+        for (int i = 0; i < jTable1.getRowCount(); i++) {
+            Boolean Seleccionado=(Boolean)jTable1.getValueAt(i, 0);
+            String Empresa=(String)jTable1.getValueAt(i, 1);
+            Integer IdFactura=(Integer)jTable1.getValueAt(i, 2);
+            Double Monto=(Double)jTable1.getValueAt(i, 3);
+            if (Seleccionado)
+            {
+                Factura p=new Factura(Empresa,IdFactura,Monto);
+                cancelar[j]=p;
+                j++;
+            }
+        }
+        try
+        {
+        String pago=operaciones.pagar(cancelar,this.llave);
+        JOptionPane.showMessageDialog(this, "Se han pagado "+j+" facturas para pagar");
+        }
+        catch (Exception e){
+	    e.printStackTrace();
+	}
+        
+    }//GEN-LAST:event_btnPagarActionPerformed
+
+    private void btnCalcularActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCalcularActionPerformed
+    double suma=0;
+        for (int i = 0; i < jTable1.getRowCount(); i++) {
+            Boolean Seleccionado=(Boolean)jTable1.getValueAt(i, 0);
+            Double Monto=(Double)jTable1.getValueAt(i, 3);
+            if (Seleccionado)
+            {
+                suma+=Monto;
+            }
+    lblTotal.setText(Double.toString(suma));               // TODO add your handling code here:
+    }//GEN-LAST:event_btnCalcularActionPerformed
+    }
     /**
      * @param args the command line arguments
      */
@@ -182,11 +300,22 @@ public class ClienteBanco extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnCalcular;
     private javax.swing.JButton btnObtener;
+    private javax.swing.JButton btnPagar;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
+    private javax.swing.JLabel lblTotal;
+    private javax.swing.JLabel lbldolares;
     private javax.swing.JTextField txtId;
     // End of variables declaration//GEN-END:variables
+
+    private Double obtenerCotizacion(java.lang.String fecha) {
+        sisbancocompleto.WsBanco_Service service = new sisbancocompleto.WsBanco_Service();
+        sisbancocompleto.WsBanco port = service.getWsBancoPort();
+        return port.obtenerCotizacion(fecha);
+    }
 }

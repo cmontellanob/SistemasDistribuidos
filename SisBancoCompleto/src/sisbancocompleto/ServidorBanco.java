@@ -8,6 +8,17 @@ import java.net.Socket;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import javax.xml.bind.DatatypeConverter;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.Claims;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.ORBPackage.InvalidName;
+import org.omg.CosNaming.NamingContextExt;
+import org.omg.CosNaming.NamingContextExtHelper;
+import org.omg.CosNaming.NamingContextPackage.CannotProceed;
+import org.omg.CosNaming.NamingContextPackage.NotFound;
+
+
 
 
 public class ServidorBanco 
@@ -15,18 +26,27 @@ public class ServidorBanco
     implements IOperacionesEmpresa
 	 
 {
+
     ServidorBanco() throws java.rmi.RemoteException{
 	super();
     }
     
-    public Factura[] calcular(int idcliente) throws RemoteException {
+   
+    public Factura[] calcular(int idcliente,String llave) throws RemoteException {
+       // Claims a=Utiles.decodeJWT(llave);
+        System.out.print(llave);
         ICessa cessa;
         try {
         cessa=(ICessa)Naming.lookup("rmi://localhost/Cessa");
-        Factura[] FacturasPendientesCessa=cessa.pedientes(idcliente);
-        String [] pendientesElapas=llamarElapas("fac-"+String.valueOf(idcliente)).split(",");
+        Factura[] FacturasPendientesCessa=cessa.pedientes(idcliente,llave);
+        String [] pendientesElapas=llamarElapas("fac-"+String.valueOf(idcliente)+"-"+llave).split(",");
         Factura[] FacturasPendientesElapas=new Factura[pendientesElapas.length];
-        Factura[] FacturasPendientes = new Factura[ FacturasPendientesCessa.length + pendientesElapas.length ];
+        String [] pendientesCotes=llamarCotes(idcliente,llave).split(",");
+        Factura[] FacturasPendientesCotes=new Factura[pendientesCotes.length];
+        Factura[] FacturasPendientes = new Factura[ FacturasPendientesCessa.length + pendientesElapas.length+ pendientesCotes.length ];
+        
+        
+        
         int i=0;
         for (String f:pendientesElapas )
         {
@@ -36,8 +56,20 @@ public class ServidorBanco
             FacturasPendientesElapas[i]=new Factura("Elapas",IdFactura,monto);
             i++;
         }
+         int j=0;
+        for (String f:pendientesCotes )
+        {
+            String[] factu=f.split("-");
+            int IdFactura=Integer.parseInt(factu[0]);
+            double monto=Integer.parseInt(factu[1]);
+            FacturasPendientesCotes[j]=new Factura("Cotes",IdFactura,monto);
+            j++;
+        }
+        
         System.arraycopy( FacturasPendientesCessa, 0, FacturasPendientes, 0, FacturasPendientesCessa.length );
         System.arraycopy( FacturasPendientesElapas, 0, FacturasPendientes, FacturasPendientesCessa.length, FacturasPendientesElapas.length );
+        System.arraycopy( FacturasPendientesCotes, 0, FacturasPendientes,FacturasPendientesCessa.length + FacturasPendientesElapas.length, FacturasPendientesCotes.length);
+
         return FacturasPendientes; 
         }
         catch (Exception e){
@@ -45,7 +77,7 @@ public class ServidorBanco
 	return null;
         }
     }    
-    public String pagar(Factura[] facturas) throws RemoteException {
+    public String pagar(Factura[] facturas,String llave) throws RemoteException {
           ICessa cessa;
         try 
         {
@@ -79,7 +111,7 @@ public class ServidorBanco
                 iCessa++;
             }
         }
-        return cessa.pagar(FacturasCessa)+llamarElapas("pag-"+facturasElapas);
+        return cessa.pagar(FacturasCessa,llave)+llamarElapas("pag-"+facturasElapas);
         }
         catch (Exception e){
 	    e.printStackTrace();
@@ -96,7 +128,7 @@ public class ServidorBanco
 	    //LocateRegistry.createRegistry(1099);
 	    Banco=new ServidorBanco(); 
 	    Naming.bind("Operaciones", Banco); 
-            System.out.println("El servidor esta listo\n");
+            System.out.println("El servidor Banco esta listo\n");
         }
 	catch (Exception e){
 	    e.printStackTrace();
@@ -118,8 +150,28 @@ public class ServidorBanco
             return null;
         }
     }
+    
 
+private String llamarCotes(int id_cliente,String llave){
+        try {
+            String[] args = null;
+            ORB orb = ORB.init(args ,null);
+            org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
+            NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
+            
+            servicioscotes servicioscotesImpl = servicioscotesHelper.narrow(ncRef.resolve_str("Cotes"));
 
+            String response = servicioscotesImpl.facturaspendientes(id_cliente,llave);
+            return response;
+
+                    
+            } catch (InvalidName | NotFound | CannotProceed | org.omg.CosNaming.NamingContextPackage.InvalidName e) {
+            System.out.println("Error: " + e);
+            e.printStackTrace(System.out);
+            }
+                //return "2200-30,3200-25,4540-48";
+                return null;
+    }
 
     
 }

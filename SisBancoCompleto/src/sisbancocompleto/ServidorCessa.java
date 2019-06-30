@@ -1,5 +1,6 @@
 package sisbancocompleto;
 
+import io.jsonwebtoken.Claims;
 import java.rmi.*;
 import java.rmi.registry.*;
 import java.rmi.server.*;
@@ -14,8 +15,11 @@ public class ServidorCessa
 	super();
     }
     
-    public Factura[] pedientes(int idcliente) throws RemoteException {
-        if (idcliente==1)
+    public Factura[] pedientes(int idcliente,String llave) throws RemoteException {
+       // Claims a=Utiles.decodeJWT(llave);
+       System.out.print(llave);
+               
+       if (idcliente==1)
         {
             Factura[] aux=new Factura[2];
             aux[0]=new Factura("Cessa",154,50.00);
@@ -35,7 +39,7 @@ public class ServidorCessa
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-        public String pagar(Factura[] facturas) throws RemoteException {
+        public String pagar(Factura[] facturas,String llave) throws RemoteException {
             return "SI";
     }    
     
@@ -47,12 +51,13 @@ public class ServidorCessa
 	    LocateRegistry.createRegistry(1099);
 	    cessa=new ServidorCessa(); 
 	    Naming.bind("Cessa", cessa); 
-            System.out.println("El servidor esta listo\n");
+            System.out.println("El servidor Cessa esta listo\n");
         }
 	catch (Exception e){
 	    e.printStackTrace();
 	}
     } 
+
    
 }
 

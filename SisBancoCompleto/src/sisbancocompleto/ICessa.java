@@ -13,7 +13,7 @@ import java.rmi.RemoteException;
  * @author Carlos
  */
 public interface ICessa extends Remote {
-    public Factura[] pedientes(int idcliente) throws RemoteException;
-    public String pagar(Factura[] facturas) throws RemoteException;
+    public Factura[] pedientes(int idcliente,String llave) throws RemoteException;
+    public String pagar(Factura[] facturas,String llave) throws RemoteException;
     
 }
