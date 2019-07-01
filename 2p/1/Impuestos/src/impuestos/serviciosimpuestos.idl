@@ -1,0 +1,4 @@
+interface serviciosimpuestos{
+        string calcularimpuesto(in long importe);
+        
+};
