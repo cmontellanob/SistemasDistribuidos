@@ -9,6 +9,7 @@ import java.rmi.Naming;
 import java.util.Scanner;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author Carlos
@@ -262,6 +263,8 @@ public class ClienteBanco extends javax.swing.JFrame {
                 suma+=Monto;
             }
     lblTotal.setText(Double.toString(suma));               // TODO add your handling code here:
+    double dolares=suma/obtenerCotizacion("30-06-2019");
+    lbldolares.setText(Double.toString(dolares));
     }//GEN-LAST:event_btnCalcularActionPerformed
     }
     /**
@@ -298,6 +301,8 @@ public class ClienteBanco extends javax.swing.JFrame {
             }
         });
     }
+    
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCalcular;
@@ -313,9 +318,14 @@ public class ClienteBanco extends javax.swing.JFrame {
     private javax.swing.JTextField txtId;
     // End of variables declaration//GEN-END:variables
 
-    private Double obtenerCotizacion(java.lang.String fecha) {
-        sisbancocompleto.WsBanco_Service service = new sisbancocompleto.WsBanco_Service();
-        sisbancocompleto.WsBanco port = service.getWsBancoPort();
+    private static Double obtenerCotizacion(java.lang.String fecha) {
+        wsbanco.WsBanco_Service service = new wsbanco.WsBanco_Service();
+        wsbanco.WsBanco port = service.getWsBancoPort();
         return port.obtenerCotizacion(fecha);
     }
+
+    
+   
+
+    
 }

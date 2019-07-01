@@ -19,7 +19,7 @@
     <target name="wsimport-client-wsBanco" depends="wsimport-init">
         <mkdir dir="${build.generated.dir}/jax-wsCache/wsBanco"/>
         <property name="wsdl-wsBanco" location="xml-resources/web-service-references/wsBanco/wsdl/localhost_20476/Banco/wsBanco.wsdl"/>
-        <wsimport sourcedestdir="${build.generated.dir}/jax-wsCache/wsBanco" destdir="${build.generated.dir}/jax-wsCache/wsBanco" wsdl="${wsdl-wsBanco}" catalog="catalog.xml" extension="true" verbose="true" fork="false" wsdlLocation="http://localhost:20476/Banco/wsBanco?wsdl" xnocompile="true" xendorsed="true" package="sisbancocompleto">
+        <wsimport sourcedestdir="${build.generated.dir}/jax-wsCache/wsBanco" destdir="${build.generated.dir}/jax-wsCache/wsBanco" wsdl="${wsdl-wsBanco}" catalog="catalog.xml" extension="true" verbose="true" fork="false" wsdlLocation="http://localhost:20476/Banco/wsBanco?wsdl" xnocompile="true" xendorsed="true">
             <depends file="${wsdl-wsBanco}"/>
             <produces dir="${build.generated.dir}/jax-wsCache/wsBanco"/>
         </wsimport>
@@ -31,24 +31,7 @@
     </target>
     <target name="wsimport-client-clean-wsBanco" depends="-init-project">
         <delete dir="${build.generated.dir}/jax-wsCache/wsBanco"/>
-        <delete dir="${build.generated.sources.dir}/jax-ws/sisbancocompleto"/>
+        <delete dir="${build.generated.sources.dir}/jax-ws/wsbanco"/>
     </target>
-    <target name="wsimport-client-wsBanco_1" depends="wsimport-init">
-        <mkdir dir="${build.generated.dir}/jax-wsCache/wsBanco_1"/>
-        <property name="wsdl-wsBanco_1" location="xml-resources/web-service-references/wsBanco_1/wsdl/localhost_20476/Banco/wsBanco.wsdl"/>
-        <wsimport sourcedestdir="${build.generated.dir}/jax-wsCache/wsBanco_1" destdir="${build.generated.dir}/jax-wsCache/wsBanco_1" wsdl="${wsdl-wsBanco_1}" catalog="catalog.xml" extension="true" verbose="true" fork="false" wsdlLocation="http://localhost:20476/Banco/wsBanco?wsdl" xnocompile="true" xendorsed="true" package="sisbancocompleto">
-            <depends file="${wsdl-wsBanco_1}"/>
-            <produces dir="${build.generated.dir}/jax-wsCache/wsBanco_1"/>
-        </wsimport>
-        <copy todir="${build.generated.sources.dir}/jax-ws">
-            <fileset dir="${build.generated.dir}/jax-wsCache/wsBanco_1">
-                <include name="**/*.java"/>
-            </fileset>
-        </copy>
-    </target>
-    <target name="wsimport-client-clean-wsBanco_1" depends="-init-project">
-        <delete dir="${build.generated.dir}/jax-wsCache/wsBanco_1"/>
-        <delete dir="${build.generated.sources.dir}/jax-ws/sisbancocompleto"/>
-    </target>
-    <target name="wsimport-client-generate" depends="wsimport-client-wsBanco, wsimport-client-wsBanco_1"/>
+    <target name="wsimport-client-generate" depends="wsimport-client-wsBanco"/>
 </project>

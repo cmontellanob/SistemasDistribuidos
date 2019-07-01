@@ -1,11 +1,18 @@
 package sisbancocompleto;
 
+import io.jsonwebtoken.Claims;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ServidorElapas {
     
@@ -28,20 +35,35 @@ public class ServidorElapas {
                 toClient = new PrintStream(client.getOutputStream()); //prepara el objetopara devolver
                 System.out.println("Comando Recibido"+cadena);
                 if (separado.length==3) {
+                     
                     String llave=separado[2];
+                    //Claims a=Utiles.decodeJWT(llave);
                     System.out.print(llave);
                     String  comando = separado[0];
                     
                     if (comando.equals("fac")) {
                         Integer idcliente  = Integer.parseInt(separado[1]);
-                        if (idcliente==1)
-                        {
-                            Respuesta="2256-36,3216-26,4547-44";
+                        PreparedStatement pst = null;
+                        ResultSet rst = null;
+                        String sql = "select * from facturas where estado='E' AND idcliente="+idcliente;
+                        System.out.println(sql);
+                        String aux="";
+                        try {
+                        ConexionPostgres posgres=new ConexionPostgres("bd_elapas");
+                        Connection conexion =posgres.conectar(); 
+                        pst = conexion.prepareStatement(sql);
+                        rst = pst.executeQuery();
+                        while(rst.next()){
+                        String nrofactura = rst.getString("nrofactura");
+                        String monto = rst.getString("monto");
+                        aux+=nrofactura+"-"+monto+",";
                         }
-                        if (idcliente==2)
-                        {
-                            Respuesta="1354-25,3252-17";
+                        } catch (SQLException ex) {
+                        Logger.getLogger(ServidorElapas.class.getName()).log(Level.SEVERE, null, ex);
                         }
+                        aux=aux.substring(0, aux.length()-1);
+                        Respuesta=aux;    
+                        
                         }
                     if (comando.equals("pag")) {
                             Respuesta="SI";
