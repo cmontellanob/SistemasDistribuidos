@@ -1,9 +1,18 @@
 package sisbancocompleto;
 
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.Block;
+import com.mongodb.DBCursor;
+import org.bson.Document;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoDatabase;
 import io.jsonwebtoken.Claims;
 import java.rmi.*;
 import java.rmi.registry.*;
 import java.rmi.server.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class ServidorCessa 
@@ -18,26 +27,30 @@ public class ServidorCessa
     public Factura[] pedientes(int idcliente,String llave) throws RemoteException {
        // Claims a=Utiles.decodeJWT(llave);
        System.out.print(llave);
-               
-       if (idcliente==1)
-        {
-            Factura[] aux=new Factura[2];
-            aux[0]=new Factura("Cessa",154,50.00);
-            aux[1]=new Factura("Cessa",326,70.00);
-            
-            return aux;
-        }
-        else if (idcliente==2)
-        {
-            Factura[] aux=new Factura[2];
-            aux[0]=new Factura("Cessa",325,60.00);
-            aux[1]=new Factura("Cessa",457,80.00);
-            
-            return aux;
-        }
-        else
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+       ConexionMongoDB mongo=new ConexionMongoDB("bd_cessa");
+       MongoDatabase m=mongo.conectar();
+       //new Document("idcliente", idcliente)
+       BasicDBObject criteria = new BasicDBObject();
+       criteria.append("idcliente", idcliente);
+       criteria.append("estado", "E");
+        FindIterable<Document> iterable = m.getCollection("facturas").find(criteria);
+       List<Factura> listafacturas=new ArrayList<Factura>();
+       //FindIterable<Document> iterable = 
+       iterable.forEach(new Block<Document>() {
+            @Override
+            public void apply(final Document document) {
+                List list = new ArrayList(document.values());
+                int nrofactura=Integer.parseInt(list.get(1).toString());
+                double monto=Double.parseDouble(list.get(3).toString());
+                Factura f=new Factura("Cessa",nrofactura,monto);
+                listafacturas.add(f);
+            }
+        });
+       Factura[] aux = new Factura[listafacturas.size()];
+       aux = listafacturas.toArray(aux);
+       return aux;
     }
+
 
         public String pagar(Factura[] facturas,String llave) throws RemoteException {
             return "SI";
